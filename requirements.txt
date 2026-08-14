@@ -1,0 +1,10 @@
+psycopg==3.3.4
+psycopg-binary==3.3.4
+python-dotenv==1.2.2
+tzdata==2026.3
+streamlit
+bcrypt
+requests
+fastapi
+uvicorn[standard]
+python-multipart

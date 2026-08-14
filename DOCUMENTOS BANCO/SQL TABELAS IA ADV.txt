@@ -1,0 +1,119 @@
+SQL TABELAS IA ADV
+
+ESCRITORIO
+CREATE TABLE escritorio(
+    id UUID PRIMARY KEY,
+    nome VARCHAR(100),
+    telefone VARCHAR(15),
+    email VARCHAR(50),
+    cnpj VARCHAR(14),
+    configuracoes JSONB,
+    criado_em TIMESTAMP
+);
+TRIBUNAL
+CREATE TABLE tribunal (
+    id UUID PRIMARY KEY,
+    nome VARCHAR(100) NOT NULL,
+    sigla VARCHAR(10) NOT NULL UNIQUE,
+    url_api VARCHAR(255),
+    ativo BOOLEAN NOT NULL DEFAULT TRUE
+);
+USUARIO
+CREATE TABLE usuario (
+    id UUID PRIMARY KEY,
+    escritorio_id UUID REFERENCES escritorio(id),
+    nome VARCHAR(100) NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    senha_hash VARCHAR(255) NOT NULL,
+    perfil VARCHAR(20) NOT NULL,
+    ativo BOOLEAN NOT NULL,
+    criado_em TIMESTAMP
+);
+);
+CLIENTE
+CREATE TABLE cliente (
+    id UUID PRIMARY KEY,
+    escritorio_id UUID REFERENCES escritorio(id),
+    nome VARCHAR(100) NOT NULL,
+    cpf_cnpj VARCHAR(18) UNIQUE NOT NULL,
+    email VARCHAR(100),
+    telefone VARCHAR(15),
+    tipo_pessoa VARCHAR(10) NOT NULL,
+    preferencias_notificacao JSONB,
+    criado_em TIMESTAMP
+);
+PROCESSO
+CREATE TABLE processo (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    escritorio_id UUID NOT NULL REFERENCES escritorio(id),
+    tribunal_id UUID NOT NULL REFERENCES tribunal(id),
+    numero_cnj VARCHAR(25) UNIQUE NOT NULL,
+    classe VARCHAR(100) NOT NULL,
+    assunto VARCHAR(255),
+    vara VARCHAR(100),
+    comarca VARCHAR(100),
+    status VARCHAR(30) NOT NULL,
+    advogado_responsavel_id UUID REFERENCES usuario(id),
+    criado_em TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    atualizado_em TIMESTAMP
+);
+CLIENTE_PROCESSO
+CREATE TABLE cliente_processo (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    cliente_id UUID NOT NULL REFERENCES cliente(id),
+    processo_id UUID NOT NULL REFERENCES processo(id),
+    papel VARCHAR(30) NOT NULL
+);
+MOVIMENTACAO
+CREATE TABLE movimentacao (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    processo_id UUID NOT NULL REFERENCES processo(id),
+    descricao_original TEXT NOT NULL,
+    descricao_resumida TEXT,
+    importancia VARCHAR(20),
+    data_movimentacao TIMESTAMP NOT NULL,
+    data_consulta TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    metadados JSONB DEFAULT '{}'
+);
+AGENDAMENTO
+CREATE TABLE agendamento (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    processo_id UUID NOT NULL REFERENCES processo(id),
+    periodicidade VARCHAR(20) NOT NULL,
+    proxima_execucao TIMESTAMP NOT NULL,
+    ativo BOOLEAN NOT NULL DEFAULT TRUE,
+    criado_em TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+RELATORIO
+CREATE TABLE relatorio (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    processo_id UUID NOT NULL REFERENCES processo(id),
+    movimentacao_id UUID REFERENCES movimentacao(id),
+    conteudo TEXT NOT NULL,
+    canal_envio VARCHAR(20) NOT NULL,
+    status_envio VARCHAR(20) NOT NULL,
+    enviado_em TIMESTAMP
+);
+MENSAGEM
+CREATE TABLE mensagem (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    cliente_id UUID NOT NULL REFERENCES cliente(id),
+    relatorio_id UUID REFERENCES relatorio(id),
+    canal VARCHAR(20) NOT NULL,
+    conteudo TEXT NOT NULL,
+    status VARCHAR(20) NOT NULL,
+    erro TEXT,
+    criado_em TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+LOG
+CREATE TABLE log (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    usuario_id UUID REFERENCES usuario(id),
+    acao VARCHAR(50) NOT NULL,
+    entidade VARCHAR(50) NOT NULL,
+    entidade_id UUID,
+    dados_anteriores JSONB,
+    dados_novos JSONB,
+    ip VARCHAR(45),
+    criado_em TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);

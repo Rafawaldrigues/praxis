@@ -1,0 +1,1137 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PRAXIS</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+:root{
+  --ink:#0b1220; --ink-2:#0f1830; --ink-3:#16233c; --ink-4:#1c2a46; --ink-5:#212f4d;
+  --gold:#c9a24b; --gold-hi:#dcb968; --gold-pale:#e8d9ae; --parchment:#f3efe6; --slate:#8a93a6; --slate-dim:#5f6c85;
+  --line:rgba(201,162,75,0.16); --line-soft:rgba(201,162,75,0.09); --red:#c15b4a; --red-soft:#e08a77; --green:#7fae7a;
+  --shadow-sm:0 1px 2px rgba(0,0,0,.28), 0 1px 1px rgba(0,0,0,.2);
+  --shadow-md:0 10px 30px -8px rgba(0,0,0,.45), 0 2px 8px rgba(0,0,0,.25);
+  --shadow-lg:0 24px 60px -12px rgba(0,0,0,.55);
+  --focus-ring:0 0 0 3px rgba(201,162,75,0.28);
+  --ease:cubic-bezier(.22,.61,.36,1);
+  --sp-1:4px; --sp-2:8px; --sp-3:12px; --sp-4:16px; --sp-5:24px; --sp-6:32px; --sp-7:48px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--ink-2);color:var(--parchment);font-family:'IBM Plex Sans',sans-serif;font-size:14.5px;line-height:1.5;-webkit-font-smoothing:antialiased;height:100vh;overflow:hidden;}
+h1,h2,h3{font-family:'Fraunces',serif;font-weight:600;letter-spacing:-0.012em;line-height:1.15;}
+.mono{font-family:'IBM Plex Mono',monospace;font-feature-settings:"tnum" 1;}
+button{font-family:inherit;cursor:pointer;}
+input,select,textarea{font-family:inherit;}
+::selection{background:rgba(201,162,75,0.32);color:#fff;}
+::-webkit-scrollbar{width:10px;height:10px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--ink-4);border-radius:6px;border:2px solid var(--ink-2);}
+::-webkit-scrollbar-thumb:hover{background:var(--ink-5);}
+a,button,input,select,textarea,tr.clickable,.list-item,.nav-item{transition:background .16s var(--ease),border-color .16s var(--ease),color .16s var(--ease),box-shadow .16s var(--ease),transform .16s var(--ease);}
+:focus-visible{outline:none;box-shadow:var(--focus-ring);border-radius:3px;}
+@media (prefers-reduced-motion:reduce){*{transition-duration:0.001ms !important;animation-duration:0.001ms !important;}}
+
+#login-screen{height:100vh;display:flex;align-items:center;justify-content:center;background:var(--ink);background-image:radial-gradient(680px 460px at 82% 8%, rgba(201,162,75,0.11), transparent 62%),radial-gradient(500px 500px at 4% 96%, rgba(201,162,75,0.05), transparent 60%);position:relative;}
+.login-card{width:410px;background:var(--ink-2);border:1px solid var(--line);border-radius:8px;padding:44px 40px;box-shadow:var(--shadow-lg);position:relative;z-index:1;animation:cardIn .5s var(--ease);}
+@keyframes cardIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+.login-brand{display:flex;flex-direction:column;align-items:center;gap:16px;margin-bottom:34px;}
+.brand-mark{width:50px;height:50px;border-radius:50%;border:1.5px solid var(--gold);display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif;color:var(--gold);font-size:22px;box-shadow:0 0 0 4px rgba(201,162,75,0.07),inset 0 0 12px rgba(201,162,75,0.08);}
+.login-brand h1{font-size:23px;color:#fff;letter-spacing:0.01em;}
+.login-tabs{display:flex;gap:3px;margin-bottom:26px;background:var(--ink-3);border-radius:5px;padding:4px;border:1px solid var(--line-soft);}
+.login-tabs button{flex:1;background:transparent;border:none;color:var(--slate);padding:9px;border-radius:3px;font-size:13px;font-weight:500;}
+.login-tabs button:hover:not(.active){color:var(--parchment);}
+.login-tabs button.active{background:var(--gold);color:var(--ink);box-shadow:var(--shadow-sm);}
+.field{margin-bottom:16px;}
+.field label{display:block;font-size:11.5px;color:var(--slate);margin-bottom:7px;text-transform:uppercase;letter-spacing:0.07em;font-weight:500;}
+.field input, .field select, .field textarea{width:100%;background:var(--ink-3);border:1px solid var(--line);border-radius:4px;color:var(--parchment);padding:10px 12px;font-size:14px;box-shadow:inset 0 1px 2px rgba(0,0,0,.2);}
+.field input::placeholder, .field textarea::placeholder{color:var(--slate-dim);}
+.field input:hover, .field select:hover, .field textarea:hover{border-color:rgba(201,162,75,0.32);}
+.field input[type=file]{padding:8px 10px;}
+.field input[type=file]::file-selector-button{background:var(--ink-4);border:1px solid var(--line);color:var(--parchment);padding:7px 13px;border-radius:3px;font-size:12.5px;font-weight:500;margin-right:12px;cursor:pointer;transition:background .16s var(--ease);}
+.field input[type=file]::file-selector-button:hover{background:var(--ink-5);}
+.field input:focus, .field select:focus, .field textarea:focus{outline:none;border-color:var(--gold);box-shadow:var(--focus-ring);}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:11px 20px;border-radius:4px;font-size:13.5px;font-weight:600;border:1px solid var(--gold);background:var(--gold);color:var(--ink);width:100%;letter-spacing:0.005em;}
+.btn:hover{background:var(--gold-hi);border-color:var(--gold-hi);box-shadow:var(--shadow-sm);transform:translateY(-1px);}
+.btn:active{transform:translateY(0);}
+.btn-ghost{background:transparent;color:var(--gold-pale);border-color:transparent;}
+.btn-ghost:hover{background:rgba(201,162,75,0.09);border-color:transparent;transform:none;box-shadow:none;}
+.btn-sm{width:auto;padding:7px 14px;font-size:12.5px;}
+.btn-danger{border-color:var(--red);color:var(--red-soft);background:transparent;}
+.btn-danger:hover{background:rgba(193,91,74,0.12);border-color:var(--red);color:var(--red-soft);box-shadow:none;transform:none;}
+.login-hint{font-size:12px;color:var(--slate);text-align:center;margin-top:18px;}
+.error-msg{background:rgba(193,91,74,0.13);border:1px solid rgba(193,91,74,0.5);color:var(--red-soft);padding:10px 13px;border-radius:4px;font-size:13px;margin-bottom:14px;}
+
+#app-screen{display:none;height:100vh;grid-template-columns:232px 1fr;}
+#app-screen.active{display:grid;}
+.sidebar{background:var(--ink);border-right:1px solid var(--line);display:flex;flex-direction:column;padding:24px 14px;}
+.sidebar .brand{display:flex;align-items:center;gap:10px;padding:0 8px 22px;border-bottom:1px solid var(--line);margin-bottom:20px;}
+.sidebar .brand .brand-mark{width:30px;height:30px;font-size:14px;box-shadow:none;}
+.sidebar .brand-name{font-family:'Fraunces',serif;font-size:16px;color:#fff;letter-spacing:0.01em;}
+.sidebar .brand-name b{color:var(--gold);}
+.nav-item{display:flex;align-items:center;gap:12px;padding:9px 12px;border-radius:5px;color:var(--slate);font-size:13.5px;font-weight:500;margin-bottom:1px;border:none;border-left:2px solid transparent;background:transparent;width:100%;text-align:left;}
+.nav-item .ic{width:18px;text-align:center;font-family:'IBM Plex Mono',monospace;color:var(--gold);font-size:11px;opacity:.55;letter-spacing:0.02em;}
+.nav-item:hover{background:var(--ink-3);color:var(--parchment);}
+.nav-item:hover .ic{opacity:.85;}
+.nav-item.active{background:var(--ink-3);color:#fff;border-left-color:var(--gold);padding-left:10px;box-shadow:inset 0 0 0 1px var(--line-soft);}
+.nav-item.active .ic{opacity:1;}
+.nav-sep{height:1px;background:var(--line);margin:14px 6px;}
+.sidebar-foot{margin-top:auto;padding-top:16px;border-top:1px solid var(--line);}
+.user-chip{display:flex;align-items:center;gap:10px;padding:6px 6px;margin-bottom:10px;}
+.user-avatar{width:31px;height:31px;border-radius:50%;background:var(--ink-3);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;color:var(--gold);font-size:12px;font-weight:600;flex:none;}
+.user-name{font-size:13px;color:var(--parchment);font-weight:500;}
+.user-role{font-size:10.5px;color:var(--slate);text-transform:uppercase;letter-spacing:0.06em;margin-top:1px;}
+.badge-count{background:var(--gold);color:var(--ink);font-size:10px;font-weight:700;border-radius:10px;padding:1px 7px;margin-left:auto;font-family:'IBM Plex Mono',monospace;}
+
+.main{overflow-y:auto;padding:36px 44px 56px;}
+.page-head{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:30px;}
+.page-head h2{font-size:27px;color:#fff;}
+.page-head .sub{color:var(--gold-pale);opacity:.75;font-size:11px;margin-top:7px;font-family:'IBM Plex Mono',monospace;text-transform:uppercase;letter-spacing:0.09em;}
+
+.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-bottom:32px;}
+.metric{background:var(--ink-3);border:1px solid var(--line);border-top:2px solid var(--gold);border-radius:0 0 6px 6px;padding:17px 20px 19px;box-shadow:var(--shadow-sm);}
+.metric .v{font-family:'IBM Plex Mono',monospace;font-size:25px;color:#fff;font-weight:500;letter-spacing:-0.01em;}
+.metric .l{font-size:11.5px;color:var(--slate);margin-top:6px;letter-spacing:0.01em;}
+.panel{background:var(--ink-3);border:1px solid var(--line);border-radius:7px;padding:24px 26px;margin-bottom:24px;box-shadow:var(--shadow-sm);}
+.panel h3{font-size:15.5px;color:#fff;margin-bottom:18px;font-weight:500;letter-spacing:0.005em;}
+
+table{width:100%;border-collapse:collapse;}
+th{text-align:left;font-size:10.5px;text-transform:uppercase;letter-spacing:0.07em;color:var(--slate-dim);padding:0 12px 10px;border-bottom:1px solid var(--line);font-weight:600;}
+td{padding:13px 12px;border-bottom:1px solid var(--line-soft);font-size:13.5px;color:var(--slate);}
+td.t-primary{color:var(--parchment);font-weight:500;}
+tr:last-child td{border-bottom:none;}
+tr.clickable{cursor:pointer;position:relative;}
+tr.clickable td:first-child{box-shadow:inset 2px 0 0 transparent;transition:box-shadow .16s var(--ease),background .16s var(--ease),color .16s var(--ease);}
+tr.clickable:hover td{background:var(--ink-4);}
+tr.clickable:hover td:first-child{box-shadow:inset 2px 0 0 var(--gold);}
+.tag{display:inline-flex;align-items:center;gap:6px;padding:3px 9px;border-radius:20px;font-size:10.5px;font-weight:600;letter-spacing:0.03em;font-family:'IBM Plex Mono',monospace;white-space:nowrap;}
+.tag::before{content:'';width:5px;height:5px;border-radius:50%;background:currentColor;flex:none;}
+.tag-alta{background:rgba(193,91,74,0.16);color:var(--red-soft);}
+.tag-media{background:rgba(201,162,75,0.16);color:var(--gold-pale);}
+.tag-baixa{background:rgba(127,174,122,0.16);color:var(--green);}
+.tag-status{background:var(--ink-4);color:var(--slate);}
+.tag-atrasado{background:rgba(193,91,74,0.22);color:var(--red-soft);}
+
+.split{display:grid;grid-template-columns:340px 1fr;gap:24px;align-items:start;}
+.list-item{padding:13px 18px;border-bottom:1px solid var(--line-soft);border-left:2px solid transparent;cursor:pointer;}
+.list-item:hover{background:var(--ink-4);}
+.list-item.active{background:var(--ink-4);border-left-color:var(--gold);}
+.list-item .name{font-size:14px;color:var(--parchment);font-weight:500;}
+.list-item .meta{font-size:11.5px;color:var(--slate);margin-top:3px;font-family:'IBM Plex Mono',monospace;}
+.search-box{background:var(--ink-3);border:1px solid var(--line);border-radius:5px;padding:11px 14px;margin-bottom:16px;color:var(--parchment);width:100%;font-size:13.5px;box-shadow:inset 0 1px 2px rgba(0,0,0,.2);}
+.search-box::placeholder{color:var(--slate-dim);}
+.search-box:focus{outline:none;border-color:var(--gold);box-shadow:var(--focus-ring);}
+.empty{color:var(--slate-dim);font-size:13px;padding:30px 0;text-align:center;}
+.detail-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;padding-bottom:18px;border-bottom:1px solid var(--line);}
+.detail-head h3{font-size:20px;color:#fff;}
+.detail-head .case{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--gold);margin-top:5px;letter-spacing:0.02em;}
+.inner-tabs{display:flex;gap:6px;border-bottom:1px solid var(--line);margin-bottom:20px;flex-wrap:wrap;}
+.inner-tab{background:transparent;border:none;color:var(--slate);padding:10px 14px;font-size:13px;font-weight:500;border-bottom:2px solid transparent;margin-bottom:-1px;}
+.inner-tab:hover{color:var(--parchment);}
+.inner-tab.active{color:var(--gold-pale);border-bottom-color:var(--gold);}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.kv{background:var(--ink-4);border-radius:5px;padding:13px 15px;}
+.kv .k{font-size:10.5px;color:var(--slate-dim);text-transform:uppercase;letter-spacing:0.06em;font-weight:600;}
+.kv .val{font-size:14px;color:var(--parchment);margin-top:4px;}
+.comment{padding:13px 0;border-bottom:1px dashed var(--line);}
+.comment .who{font-size:12.5px;color:var(--gold-pale);font-weight:600;}
+.comment .when{font-size:11px;color:var(--slate-dim);margin-left:8px;}
+.comment .txt{font-size:13.5px;margin-top:5px;color:var(--parchment);line-height:1.55;}
+.notice-card{background:var(--ink-3);border:1px solid var(--line);border-left:2px solid var(--gold);border-radius:0 7px 7px 0;padding:18px 20px;margin-bottom:14px;display:flex;justify-content:space-between;gap:16px;box-shadow:var(--shadow-sm);}
+.notice-card .msg{background:var(--ink-4);border-radius:5px;padding:12px 14px;margin-top:10px;font-size:13px;color:var(--parchment);white-space:pre-line;line-height:1.55;}
+.checklist{max-height:160px;overflow-y:auto;background:var(--ink-4);border-radius:5px;padding:10px 14px;}
+.checklist label{display:block;font-size:13px;padding:5px 0;font-weight:400;text-transform:none;color:var(--parchment);}
+.inline-form{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-bottom:18px;align-items:end;}
+.inline-form .field{margin-bottom:0;}
+.toast{position:fixed;bottom:26px;right:26px;background:var(--ink-3);border:1px solid var(--gold);color:var(--parchment);padding:12px 18px;border-radius:5px;font-size:13px;z-index:200;box-shadow:var(--shadow-md);animation:toastIn .25s var(--ease);}
+@keyframes toastIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+
+.modal-overlay{position:fixed;inset:0;background:rgba(6,9,18,0.68);display:none;align-items:center;justify-content:center;z-index:100;backdrop-filter:blur(1.5px);}
+.modal-overlay.active{display:flex;animation:overlayIn .15s var(--ease);}
+@keyframes overlayIn{from{opacity:0;}to{opacity:1;}}
+.modal-box{background:var(--ink-2);border:1px solid var(--line);border-radius:8px;padding:30px;width:460px;max-height:82vh;overflow-y:auto;box-shadow:var(--shadow-lg);animation:modalIn .2s var(--ease);}
+@keyframes modalIn{from{opacity:0;transform:translateY(10px) scale(.98);}to{opacity:1;transform:translateY(0) scale(1);}}
+.modal-box h3{color:#fff;font-size:18.5px;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--line);}
+.modal-actions{display:flex;gap:10px;margin-top:10px;}
+.modal-actions .btn-ghost{border:1px solid var(--line);}
+
+@media (max-width:900px){.split{grid-template-columns:1fr;}.grid-2{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+
+<div id="login-screen">
+  <div class="login-card">
+    <div class="login-brand">
+      <div class="brand-mark">&sect;</div>
+      <h1><b style="color:var(--gold)">PRAXIS</b></h1>
+    </div>
+    <div id="login-error"></div>
+    <div class="login-tabs">
+      <button class="active" onclick="setLoginTab('entrar')" id="tab-entrar">Entrar</button>
+      <button onclick="setLoginTab('criar')" id="tab-criar">Criar escritório</button>
+    </div>
+
+    <div id="login-form-entrar">
+      <div class="field"><label>E-mail</label><input type="email" id="login-email"></div>
+      <div class="field"><label>Senha</label><input type="password" id="login-senha"></div>
+      <button class="btn" onclick="entrar()">Entrar</button>
+    </div>
+
+    <div id="login-form-criar" style="display:none;">
+      <div class="field"><label>Nome do escritório</label><input type="text" id="criar-escritorio" placeholder="Ex: Almeida & Souza Advocacia"></div>
+      <div class="field"><label>Seu nome</label><input type="text" id="criar-nome"></div>
+      <div class="field"><label>Seu e-mail</label><input type="email" id="criar-email"></div>
+      <div class="field"><label>Senha</label><input type="password" id="criar-senha"></div>
+      <button class="btn" onclick="criarEscritorio()">Criar escritório</button>
+    </div>
+
+
+  </div>
+</div>
+
+<div id="app-screen">
+  <aside class="sidebar">
+    <div class="brand"><div class="brand-mark">&sect;</div><div class="brand-name">PRAXIS</div></div>
+    <div id="nav-items"></div>
+    <div class="sidebar-foot">
+      <div class="user-chip">
+        <div class="user-avatar" id="user-avatar">U</div>
+        <div><div class="user-name" id="user-name"></div><div class="user-role" id="user-role"></div></div>
+      </div>
+      <button class="btn btn-ghost btn-sm" style="width:100%" onclick="sair()">Sair</button>
+    </div>
+  </aside>
+  <main class="main" id="main"></main>
+</div>
+
+<div class="modal-overlay" id="modal-overlay" onclick="if(event.target===this) closeModal()">
+  <div class="modal-box" id="modal-box"></div>
+</div>
+
+<script>
+/* ============================================================
+   CONFIG E ESTADO
+   ============================================================ */
+// Em localhost (abrindo o arquivo direto ou via servidor estático simples,
+// enquanto a API roda separada na porta 8000), fala com localhost:8000.
+// Em produção, o front e a API sao servidos pelo MESMO container/dominio
+// (ver deploy), entao usa a propria origem, sem prefixo nenhum.
+const API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+  ? 'http://localhost:8000'
+  : window.location.origin;
+
+let sessao = JSON.parse(localStorage.getItem('praxis_sessao') || 'null');
+
+let currentView = 'painel';
+let selectedProcesso = null;
+let selectedCliente = null;
+let processoTab = 'visao';
+let equipeCache = [];
+
+let stateClientes = [], stateProcessos = [], stateAgenda = [],
+    stateAvisos = [], stateEquipe = [], statePainel = null,
+    stateRelatorioMov = [], stateRelatorioParados = [];
+
+let relatorioSubTab = 'movimentacoes';
+let stateRelProdutividade = [];
+let stateRelDistribuicao = null;
+let stateRelPrazos = null;
+let stateRelQualidade = null;
+let stateRelClienteSelecionado = '';
+let stateRelClienteHistorico = null;
+let chartInstances = {};
+
+/* ============================================================
+   HELPERS
+   ============================================================ */
+
+function escapeHtml(s){
+  if(s===null || s===undefined) return '';
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function fmtMoeda(v){ if(v===null||v===undefined) return '—'; return 'R$ ' + Number(v).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+function tagImportancia(imp){ return `<span class="tag tag-${imp||'media'}">${(imp||'-').toUpperCase()}</span>`; }
+function toast(msg){
+  const el = document.createElement('div'); el.className='toast'; el.textContent=msg;
+  document.body.appendChild(el); setTimeout(()=>el.remove(), 2600);
+}
+function openModal(html){ document.getElementById('modal-box').innerHTML = html; document.getElementById('modal-overlay').classList.add('active'); }
+function closeModal(){ document.getElementById('modal-overlay').classList.remove('active'); }
+
+async function api(method, path, body){
+  const headers = {};
+  if(sessao) headers['Authorization'] = 'Bearer ' + sessao.token;
+  const opts = { method, headers };
+  if(body instanceof FormData){
+    opts.body = body;
+  } else if(body !== undefined){
+    headers['Content-Type'] = 'application/json';
+    opts.body = JSON.stringify(body);
+  }
+  const res = await fetch(API_BASE + path, opts);
+  if(res.status === 401){ sair(); throw new Error('Sessão expirada.'); }
+  if(!res.ok){
+    let msg = 'Erro na requisição (' + res.status + ')';
+    try{ const j = await res.json(); msg = j.detail || msg; }catch(e){}
+    throw new Error(msg);
+  }
+  const ct = res.headers.get('content-type') || '';
+  if(ct.includes('application/json')) return res.json();
+  return res;
+}
+
+/* Removido a pedido do usuário: nao guardar documentos/PDFs sensiveis no app */
+
+/* ============================================================
+   AUTENTICAÇÃO
+   ============================================================ */
+
+function setLoginTab(tab){
+  document.getElementById('tab-entrar').classList.toggle('active', tab==='entrar');
+  document.getElementById('tab-criar').classList.toggle('active', tab==='criar');
+  document.getElementById('login-form-entrar').style.display = tab==='entrar' ? 'block' : 'none';
+  document.getElementById('login-form-criar').style.display = tab==='criar' ? 'block' : 'none';
+  document.getElementById('login-error').innerHTML = '';
+}
+
+function mostrarErroLogin(msg){
+  document.getElementById('login-error').innerHTML = `<div class="error-msg">${escapeHtml(msg)}</div>`;
+}
+
+async function entrar(){
+  const email = document.getElementById('login-email').value.trim();
+  const senha = document.getElementById('login-senha').value;
+  if(!email || !senha){ mostrarErroLogin('Preencha e-mail e senha.'); return; }
+  try{
+    sessao = await api('POST', '/auth/login', {email, senha});
+    localStorage.setItem('praxis_sessao', JSON.stringify(sessao));
+    entrarComSessao();
+  }catch(e){ mostrarErroLogin(e.message); }
+}
+
+async function criarEscritorio(){
+  const nome_escritorio = document.getElementById('criar-escritorio').value.trim();
+  const nome_usuario = document.getElementById('criar-nome').value.trim();
+  const email = document.getElementById('criar-email').value.trim();
+  const senha = document.getElementById('criar-senha').value;
+  if(!nome_escritorio || !nome_usuario || !email || !senha){ mostrarErroLogin('Preencha todos os campos.'); return; }
+  try{
+    sessao = await api('POST', '/auth/criar-escritorio', {nome_escritorio, nome_usuario, email, senha});
+    localStorage.setItem('praxis_sessao', JSON.stringify(sessao));
+    entrarComSessao();
+  }catch(e){ mostrarErroLogin(e.message); }
+}
+
+function entrarComSessao(){
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('app-screen').classList.add('active');
+  document.getElementById('user-name').textContent = sessao.usuario.nome;
+  document.getElementById('user-role').textContent = sessao.usuario.perfil;
+  document.getElementById('user-avatar').textContent = (sessao.usuario.nome.replace(/^Dr[a]?\.\s*/,'')[0] || 'U').toUpperCase();
+  renderNav();
+  navigate('painel');
+}
+
+function sair(){
+  sessao = null;
+  localStorage.removeItem('praxis_sessao');
+  document.getElementById('app-screen').classList.remove('active');
+  document.getElementById('login-screen').style.display = 'flex';
+}
+
+window.addEventListener('DOMContentLoaded', () => { if(sessao) entrarComSessao(); });
+
+/* ============================================================
+   NAVEGAÇÃO
+   ============================================================ */
+
+const NAV = [
+  {id:'painel',label:'Painel',ic:'01'}, {id:'clientes',label:'Clientes',ic:'02'},
+  {id:'processos',label:'Processos',ic:'03'}, {id:'agenda',label:'Agenda',ic:'04'},
+  {id:'avisos',label:'Avisos',ic:'06'},
+  {id:'buscar',label:'Buscar',ic:'07'},
+];
+const NAV_LIDER = [ {id:'equipe',label:'Equipe',ic:'08'}, {id:'relatorio',label:'Relatório',ic:'09'} ];
+
+function renderNav(){
+  const lider = sessao.usuario.perfil === 'lider';
+  const all = lider ? [...NAV, {sep:true}, ...NAV_LIDER] : NAV;
+  document.getElementById('nav-items').innerHTML = all.map(item=>{
+    if(item.sep) return `<div class="nav-sep"></div>`;
+    const badge = item.id==='avisos' && stateAvisos.length ? `<span class="badge-count">${stateAvisos.length}</span>` : '';
+    return `<button class="nav-item ${currentView===item.id?'active':''}" onclick="navigate('${item.id}')">
+      <span class="ic">${item.ic}</span><span>${item.label}</span>${badge}</button>`;
+  }).join('');
+}
+
+async function navigate(view){
+  currentView = view; selectedProcesso = null; selectedCliente = null;
+  renderNav();
+  document.getElementById('main').innerHTML = '<div class="empty">Carregando…</div>';
+  try{
+    if(view==='painel') statePainel = await api('GET','/painel');
+    else if(view==='clientes') stateClientes = await api('GET','/clientes');
+    else if(view==='processos') stateProcessos = await api('GET','/processos');
+    else if(view==='agenda') stateAgenda = await api('GET','/agenda?incluir_concluidos=false');
+    else if(view==='avisos') stateAvisos = await api('GET','/avisos');
+    else if(view==='equipe') stateEquipe = await api('GET','/equipe');
+    else if(view==='relatorio'){ relatorioSubTab='movimentacoes'; stateRelatorioMov = await api('GET','/relatorio/movimentacoes?ordenar_por=recente'); stateRelatorioParados = await api('GET','/relatorio/parados?ordem=mais_tempo'); }
+    renderNav();
+    render();
+  }catch(e){
+    document.getElementById('main').innerHTML = `<div class="empty">Erro ao carregar: ${escapeHtml(e.message)}</div>`;
+  }
+}
+
+function render(){
+  const main = document.getElementById('main');
+  if(currentView==='painel') main.innerHTML = viewPainel();
+  else if(currentView==='clientes') main.innerHTML = viewClientes();
+  else if(currentView==='processos') main.innerHTML = selectedProcesso ? viewProcessoDetalhe() : viewProcessos();
+  else if(currentView==='agenda') main.innerHTML = viewAgenda();
+  else if(currentView==='avisos') main.innerHTML = viewAvisos();
+  else if(currentView==='buscar') main.innerHTML = viewBuscar();
+  else if(currentView==='equipe') main.innerHTML = viewEquipe();
+  else if(currentView==='relatorio'){ main.innerHTML = viewRelatorio(); desenharGraficosRelatorio(); }
+}
+
+/* ============================================================
+   PAINEL
+   ============================================================ */
+
+function viewPainel(){
+  const p = statePainel;
+  return `
+    <div class="page-head"><div><h2>Painel</h2><div class="sub">${escapeHtml(sessao.escritorio.nome)}</div></div></div>
+    <div class="metrics">
+      <div class="metric"><div class="v">${p.metrics.clientes_ativos}</div><div class="l">Clientes ativos</div></div>
+      <div class="metric"><div class="v">${p.metrics.processos_visiveis}</div><div class="l">Processos visíveis</div></div>
+      <div class="metric"><div class="v">${p.metrics.avisos_pendentes}</div><div class="l">Avisos pendentes</div></div>
+      <div class="metric"><div class="v">${p.metrics.compromissos_futuros}</div><div class="l">Compromissos futuros</div></div>
+    </div>
+    <div class="panel"><h3>Próximos compromissos</h3>
+      <table><thead><tr><th>Data</th><th>Tipo</th><th>Descrição</th><th>Processo</th></tr></thead><tbody>
+        ${p.proximos_compromissos.map(c=>`<tr><td class="mono">${(c.data_hora||'').replace('T',' ').slice(0,16)}</td><td>${escapeHtml(c.tipo)}</td><td class="t-primary">${escapeHtml(c.descricao)}</td><td class="mono">${escapeHtml(c.processo_numero)}</td></tr>`).join('') || `<tr><td colspan="4" class="empty">Nada agendado.</td></tr>`}
+      </tbody></table>
+    </div>
+    ${p.processos_parados ? `
+    <div class="panel"><h3>Processos parados há mais tempo</h3>
+      <table><thead><tr><th>Processo</th><th>Status</th><th>Advogado</th><th>Última atualização</th></tr></thead><tbody>
+        ${p.processos_parados.map(x=>`<tr><td class="mono t-primary">${escapeHtml(x.numero_cnj)}</td><td><span class="tag tag-status">${escapeHtml(x.status)}</span></td><td>${escapeHtml(x.advogado_nome||'—')}</td><td class="mono">${(x.ultima_movimentacao||'nunca').slice(0,10)}</td></tr>`).join('')}
+      </tbody></table>
+    </div>` : ''}
+  `;
+}
+
+/* ============================================================
+   CLIENTES
+   ============================================================ */
+
+function viewClientes(){
+  return `
+    <div class="page-head"><div><h2>Clientes</h2><div class="sub">${stateClientes.length} cadastrados</div></div>
+      <button class="btn btn-sm" style="width:auto" onclick="abrirModalNovoCliente()">+ Novo cliente</button></div>
+    <div class="split">
+      <div class="panel" style="padding:0;">
+        ${stateClientes.map(c=>`<div class="list-item ${selectedCliente&&selectedCliente.id===c.id?'active':''}" onclick="abrirCliente('${c.id}')">
+          <div class="name">${escapeHtml(c.nome)}${c.ativo?'':' (inativo)'}</div><div class="meta">${escapeHtml(c.cpf_cnpj)}</div></div>`).join('') || `<div class="empty">Nenhum cliente ainda.</div>`}
+      </div>
+      <div class="panel" id="cliente-detalhe">${selectedCliente ? renderClienteDetalhe() : `<div class="empty">Selecione um cliente à esquerda.</div>`}</div>
+    </div>
+  `;
+}
+
+async function abrirCliente(id){
+  try{ selectedCliente = await api('GET', `/clientes/${id}`); render(); }
+  catch(e){ toast(e.message); }
+}
+
+function renderClienteDetalhe(){
+  const c = selectedCliente;
+  return `
+    <div class="detail-head"><div><h3>${escapeHtml(c.nome)}</h3><div class="case">${c.tipo_pessoa==='fisica'?'Pessoa física':'Pessoa jurídica'}${c.idade?` · ${c.idade} anos`:''}</div></div>
+      <button class="btn ${c.ativo?'btn-danger':'btn-ghost'} btn-sm" onclick="toggleAtivoCliente('${c.id}', ${c.ativo})">${c.ativo?'Desativar':'Reativar'}</button>
+    </div>
+    <form onsubmit="salvarCliente(event,'${c.id}')">
+      <div class="grid-2" style="margin-bottom:12px;">
+        <div class="field"><label>Nome</label><input name="nome" value="${escapeHtml(c.nome)}"></div>
+        <div class="field"><label>CPF/CNPJ</label><input name="cpf_cnpj" value="${escapeHtml(c.cpf_cnpj)}"></div>
+        <div class="field"><label>Idade</label><input name="idade" type="number" value="${c.idade||''}"></div>
+        <div class="field"><label>Tipo</label><select name="tipo_pessoa"><option value="fisica" ${c.tipo_pessoa==='fisica'?'selected':''}>Física</option><option value="juridica" ${c.tipo_pessoa==='juridica'?'selected':''}>Jurídica</option></select></div>
+        <div class="field"><label>E-mail</label><input name="email" value="${escapeHtml(c.email||'')}"></div>
+        <div class="field"><label>Telefone</label><input name="telefone" value="${escapeHtml(c.telefone||'')}"></div>
+        <div class="field"><label>WhatsApp</label><input name="whatsapp" value="${escapeHtml(c.whatsapp||'')}"></div>
+      </div>
+      <button class="btn btn-sm" style="width:auto" type="submit">Salvar alterações</button>
+    </form>
+    <h3 style="margin-top:22px;">Processos vinculados</h3>
+    <table><thead><tr><th>Número</th><th>Classe</th><th>Status</th></tr></thead><tbody>
+      ${c.processos_vinculados.map(p=>`<tr><td class="mono t-primary">${escapeHtml(p.numero_cnj)}</td><td>${escapeHtml(p.classe)}</td><td><span class="tag tag-status">${escapeHtml(p.status)}</span></td></tr>`).join('') || `<tr><td colspan="3" class="empty">Nenhum processo vinculado.</td></tr>`}
+    </tbody></table>
+  `;
+}
+
+async function salvarCliente(ev, id){
+  ev.preventDefault();
+  const f = ev.target;
+  const body = {
+    nome: f.nome.value, cpf_cnpj: f.cpf_cnpj.value, idade: f.idade.value ? parseInt(f.idade.value) : null,
+    tipo_pessoa: f.tipo_pessoa.value, email: f.email.value, telefone: f.telefone.value, whatsapp: f.whatsapp.value,
+  };
+  try{
+    await api('PUT', `/clientes/${id}`, body);
+    toast('Cliente atualizado.');
+    stateClientes = await api('GET','/clientes');
+    await abrirCliente(id);
+  }catch(e){ toast(e.message); }
+}
+
+async function toggleAtivoCliente(id, ativo){
+  try{
+    await api('POST', `/clientes/${id}/${ativo?'desativar':'reativar'}`);
+    stateClientes = await api('GET','/clientes');
+    await abrirCliente(id);
+  }catch(e){ toast(e.message); }
+}
+
+function abrirModalNovoCliente(){
+  openModal(`
+    <h3>Novo cliente</h3>
+    <form onsubmit="criarCliente(event)">
+      <div class="field"><label>Nome</label><input name="nome" required></div>
+      <div class="field"><label>CPF/CNPJ</label><input name="cpf_cnpj" required></div>
+      <div class="field"><label>Idade</label><input name="idade" type="number"></div>
+      <div class="field"><label>Tipo</label><select name="tipo_pessoa"><option value="fisica">Física</option><option value="juridica">Jurídica</option></select></div>
+      <div class="field"><label>E-mail</label><input name="email" type="email"></div>
+      <div class="field"><label>Telefone</label><input name="telefone"></div>
+      <div class="field"><label>WhatsApp</label><input name="whatsapp"></div>
+      <div class="modal-actions">
+        <button type="submit" class="btn">Cadastrar</button>
+        <button type="button" class="btn btn-ghost" onclick="closeModal()">Cancelar</button>
+      </div>
+    </form>
+  `);
+}
+
+async function criarCliente(ev){
+  ev.preventDefault();
+  const f = ev.target;
+  const body = {
+    nome: f.nome.value, cpf_cnpj: f.cpf_cnpj.value, idade: f.idade.value ? parseInt(f.idade.value) : null,
+    tipo_pessoa: f.tipo_pessoa.value, email: f.email.value, telefone: f.telefone.value, whatsapp: f.whatsapp.value,
+  };
+  try{
+    await api('POST', '/clientes', body);
+    closeModal(); toast('Cliente cadastrado.');
+    stateClientes = await api('GET','/clientes'); render();
+  }catch(e){ toast(e.message); }
+}
+
+/* ============================================================
+   PROCESSOS
+   ============================================================ */
+
+function viewProcessos(){
+  return `
+    <div class="page-head"><div><h2>Processos</h2><div class="sub">${stateProcessos.length} visíveis</div></div>
+      <button class="btn btn-sm" style="width:auto" onclick="abrirModalNovoProcesso()">+ Novo processo</button></div>
+    <div class="panel" style="padding:0;">
+      <table><thead><tr><th>Número CNJ</th><th>Classe</th><th>Status</th><th>Advogado</th></tr></thead><tbody>
+        ${stateProcessos.map(p=>`<tr class="clickable" onclick="abrirProcesso('${p.id}')">
+          <td class="mono t-primary">${escapeHtml(p.numero_cnj)}</td><td>${escapeHtml(p.classe)}</td>
+          <td><span class="tag tag-status">${escapeHtml(p.status)}</span></td>
+          <td>${p.advogado_nome ? escapeHtml(p.advogado_nome) : '<span style="color:var(--slate-dim)">não atribuído</span>'}</td></tr>`).join('') || `<tr><td colspan="4" class="empty">Nenhum processo ainda.</td></tr>`}
+      </tbody></table>
+    </div>
+  `;
+}
+
+async function abrirProcesso(id){
+  try{ selectedProcesso = await api('GET', `/processos/${id}`); processoTab = 'visao'; render(); }
+  catch(e){ toast(e.message); }
+}
+
+async function recarregarProcesso(){
+  selectedProcesso = await api('GET', `/processos/${selectedProcesso.id}`);
+  render();
+}
+
+function viewProcessoDetalhe(){
+  const p = selectedProcesso;
+  const tabs = [['visao','Visão geral'],['historico','Histórico'],['agenda','Agenda'],['comentarios','Comentários']];
+  let body = '';
+
+  if(processoTab==='visao'){
+    body = `
+      <div class="grid-2">
+        <div class="kv"><div class="k">Vara</div><div class="val">${escapeHtml(p.vara||'-')}</div></div>
+        <div class="kv"><div class="k">Comarca</div><div class="val">${escapeHtml(p.comarca||'-')}</div></div>
+        <div class="kv"><div class="k">Assunto</div><div class="val">${escapeHtml(p.assunto||'-')}</div></div>
+        <div class="kv"><div class="k">Valor da causa</div><div class="val mono">${fmtMoeda(p.valor_causa)}</div></div>
+      </div>
+      <div style="margin:16px 0;">Cliente(s): ${p.clientes_vinculados.map(c=>escapeHtml(c.nome)).join(', ') || '—'}</div>
+
+      <form onsubmit="salvarProcesso(event)" style="margin-bottom:20px;">
+        <div class="inline-form">
+          <div class="field"><label>Classe</label><input name="classe" value="${escapeHtml(p.classe)}"></div>
+          <div class="field"><label>Assunto</label><input name="assunto" value="${escapeHtml(p.assunto||'')}"></div>
+          <div class="field"><label>Vara</label><input name="vara" value="${escapeHtml(p.vara||'')}"></div>
+          <div class="field"><label>Comarca</label><input name="comarca" value="${escapeHtml(p.comarca||'')}"></div>
+          <div class="field"><label>Status</label><select name="status">${['ativo','arquivado','suspenso','baixado'].map(s=>`<option value="${s}" ${p.status===s?'selected':''}>${s}</option>`).join('')}</select></div>
+          <div class="field"><label>Valor da causa</label><input name="valor_causa" type="number" step="0.01" value="${p.valor_causa||''}"></div>
+        </div>
+        <button class="btn btn-sm" style="width:auto" type="submit">Salvar alterações</button>
+      </form>
+
+      ${sessao.usuario.perfil==='lider' ? `
+        <div class="field" style="max-width:280px;">
+          <label>Advogado responsável</label>
+          <select id="select-atribuir">
+            <option value="">Ninguém</option>
+            ${equipeCache.map(u=>`<option value="${u.id}" ${p.advogado_id===u.id?'selected':''}>${escapeHtml(u.nome)}</option>`).join('')}
+          </select>
+        </div>
+        <button class="btn btn-ghost btn-sm" onclick="salvarAtribuicao()">Salvar atribuição</button>
+      ` : (p.advogado_id ? (p.advogado_id===sessao.usuario.id ? `<p style="color:var(--slate);font-size:13px;">Este processo está atribuído a você.</p>` : `<p style="color:var(--slate);font-size:13px;">Atribuído a outro advogado da equipe.</p>`)
+        : `<button class="btn btn-sm" style="width:auto" onclick="pegarProcesso()">Pegar este processo pra mim</button>`)}
+    `;
+  } else if(processoTab==='historico'){
+    body = `
+      <form onsubmit="registrarMovimentacao(event)" class="inline-form">
+        <div class="field"><label>Tipo</label><select name="tipo_evento">${['Nova movimentação','Audiência marcada','Prazo','Decisão/Sentença','Documento juntado','Outro'].map(t=>`<option>${t}</option>`).join('')}</select></div>
+        <div class="field"><label>Importância</label><select name="importancia"><option value="alta">alta</option><option value="media" selected>media</option><option value="baixa">baixa</option></select></div>
+        <div class="field"><label>Data</label><input name="data" type="date" value="${new Date().toISOString().slice(0,10)}"></div>
+        <div class="field" style="grid-column:1/-1;"><label>O que mudou?</label><input name="descricao" required></div>
+        <button class="btn btn-sm" style="width:auto" type="submit">Registrar e gerar aviso</button>
+      </form>
+      <table><thead><tr><th>Data</th><th>Importância</th><th>Descrição</th></tr></thead><tbody>
+        ${p.movimentacoes.map(m=>`<tr><td class="mono">${(m.data||'').slice(0,10)}</td><td>${tagImportancia(m.importancia)}</td><td class="t-primary">${escapeHtml(m.descricao)}</td></tr>`).join('') || `<tr><td colspan="3" class="empty">Nenhuma movimentação.</td></tr>`}
+      </tbody></table>`;
+  } else if(processoTab==='agenda'){
+    body = `
+      <form onsubmit="criarCompromisso(event)" class="inline-form">
+        <div class="field"><label>Tipo</label><select name="tipo">${['audiencia','prazo','reuniao','outro'].map(t=>`<option>${t}</option>`).join('')}</select></div>
+        <div class="field" style="grid-column:span 2;"><label>Descrição</label><input name="descricao" required></div>
+        <div class="field"><label>Data e hora</label><input name="data_hora" type="datetime-local" required></div>
+        <button class="btn btn-sm" style="width:auto" type="submit">Adicionar</button>
+      </form>
+      <table><thead><tr><th>Tipo</th><th>Descrição</th><th>Data</th><th>Status</th></tr></thead><tbody>
+        ${p.agenda.map(a=>`<tr><td>${escapeHtml(a.tipo)}</td><td class="t-primary">${escapeHtml(a.descricao)}</td><td class="mono">${(a.data_hora||'').replace('T',' ').slice(0,16)}</td><td><span class="tag tag-status">${a.concluido?'concluído':'pendente'}</span></td></tr>`).join('') || `<tr><td colspan="4" class="empty">Nada agendado.</td></tr>`}
+      </tbody></table>`;
+  } else if(processoTab==='comentarios'){
+    body = `
+      <form onsubmit="criarComentario(event)">
+        <textarea name="texto" rows="2" placeholder="Adicionar comentário..." style="width:100%;background:var(--ink-4);border:1px solid var(--line);border-radius:5px;color:var(--parchment);padding:11px 12px;margin-bottom:10px;font-size:13.5px;box-shadow:inset 0 1px 2px rgba(0,0,0,.2);"></textarea>
+        <button class="btn btn-sm" style="width:auto;margin-bottom:16px;" type="submit">Comentar</button>
+      </form>
+      ${p.comentarios.map(c=>`<div class="comment"><span class="who">${escapeHtml(c.autor)}</span><span class="when">${(c.criado_em||'').replace('T',' ').slice(0,16)}</span><div class="txt">${escapeHtml(c.texto)}</div></div>`).join('') || `<div class="empty">Nenhum comentário ainda.</div>`}`;
+  }
+
+  if(sessao.usuario.perfil==='lider' && equipeCache.length===0){
+    api('GET','/equipe').then(e=>{ equipeCache=e; if(currentView==='processos' && selectedProcesso) render(); }).catch(()=>{});
+  }
+
+  return `
+    <button class="btn btn-ghost btn-sm" style="margin-bottom:18px;width:auto;" onclick="selectedProcesso=null;navigate('processos')">&larr; Voltar</button>
+    <div class="panel">
+      <div class="detail-head"><div><h3>Processo</h3><div class="case">${escapeHtml(p.numero_cnj)}</div></div><span class="tag tag-status">${escapeHtml(p.status)}</span></div>
+      <div class="inner-tabs">${tabs.map(([id,label])=>`<button class="inner-tab ${processoTab===id?'active':''}" onclick="processoTab='${id}';render()">${label}</button>`).join('')}</div>
+      ${body}
+    </div>
+  `;
+}
+
+async function salvarProcesso(ev){
+  ev.preventDefault(); const f = ev.target;
+  const body = { classe:f.classe.value, assunto:f.assunto.value, vara:f.vara.value, comarca:f.comarca.value, status:f.status.value, valor_causa: f.valor_causa.value ? parseFloat(f.valor_causa.value) : null };
+  try{ await api('PUT', `/processos/${selectedProcesso.id}`, body); toast('Processo atualizado.'); await recarregarProcesso(); }
+  catch(e){ toast(e.message); }
+}
+
+async function salvarAtribuicao(){
+  const usuario_id = document.getElementById('select-atribuir').value || null;
+  try{ await api('POST', `/processos/${selectedProcesso.id}/atribuir`, {usuario_id}); toast('Atribuição atualizada.'); await recarregarProcesso(); }
+  catch(e){ toast(e.message); }
+}
+
+async function pegarProcesso(){
+  try{ await api('POST', `/processos/${selectedProcesso.id}/atribuir`, {usuario_id: sessao.usuario.id}); toast('Processo atribuído a você.'); await recarregarProcesso(); }
+  catch(e){ toast(e.message); }
+}
+
+async function registrarMovimentacao(ev){
+  ev.preventDefault(); const f = ev.target;
+  const body = { tipo_evento:f.tipo_evento.value, descricao:f.descricao.value, importancia:f.importancia.value, data:f.data.value };
+  try{ await api('POST', `/processos/${selectedProcesso.id}/movimentacoes`, body); toast('Atualização registrada.'); await recarregarProcesso(); }
+  catch(e){ toast(e.message); }
+}
+
+async function criarCompromisso(ev){
+  ev.preventDefault(); const f = ev.target;
+  const body = { tipo:f.tipo.value, descricao:f.descricao.value, data_hora:f.data_hora.value };
+  try{ await api('POST', `/processos/${selectedProcesso.id}/compromissos`, body); toast('Adicionado à agenda.'); await recarregarProcesso(); }
+  catch(e){ toast(e.message); }
+}
+
+async function criarComentario(ev){
+  ev.preventDefault(); const f = ev.target;
+  if(!f.texto.value.trim()) return;
+  try{ await api('POST', `/processos/${selectedProcesso.id}/comentarios`, {texto:f.texto.value.trim()}); await recarregarProcesso(); }
+  catch(e){ toast(e.message); }
+}
+
+async function abrirModalNovoProcesso(){
+  if(stateClientes.length===0) stateClientes = await api('GET','/clientes');
+  if(sessao.usuario.perfil==='lider' && equipeCache.length===0) equipeCache = await api('GET','/equipe');
+
+  const opcoesAtribuir = sessao.usuario.perfil==='lider'
+    ? `<option value="">Não atribuir</option>${equipeCache.map(u=>`<option value="${u.id}">${escapeHtml(u.nome)}</option>`).join('')}`
+    : `<option value="">Não atribuir</option><option value="${sessao.usuario.id}">Atribuir a mim</option>`;
+
+  openModal(`
+    <h3>Novo processo</h3>
+    <form onsubmit="criarProcesso(event)">
+      <div class="field"><label>Número CNJ</label><input name="numero_cnj" required></div>
+      <div class="field"><label>Classe</label><input name="classe" required></div>
+      <div class="field"><label>Assunto</label><input name="assunto"></div>
+      <div class="grid-2">
+        <div class="field"><label>Vara</label><input name="vara"></div>
+        <div class="field"><label>Comarca</label><input name="comarca"></div>
+      </div>
+      <div class="grid-2">
+        <div class="field"><label>Status</label><select name="status">${['ativo','arquivado','suspenso','baixado'].map(s=>`<option>${s}</option>`).join('')}</select></div>
+        <div class="field"><label>Valor da causa</label><input name="valor_causa" type="number" step="0.01"></div>
+      </div>
+      <div class="field"><label>Sigla do tribunal (deixe em branco pra detectar automaticamente)</label><input name="sigla_tribunal" placeholder="ex: tjsp, trf1"></div>
+      <div class="field"><label>Atribuir a</label><select name="atribuir">${opcoesAtribuir}</select></div>
+      <div class="field"><label>Cliente(s) vinculado(s)</label>
+        <div class="checklist">${stateClientes.map(c=>`<label><input type="checkbox" name="clientes" value="${c.id}"> ${escapeHtml(c.nome)}</label>`).join('') || 'Nenhum cliente cadastrado ainda.'}</div>
+      </div>
+      <div class="modal-actions">
+        <button type="submit" class="btn">Cadastrar</button>
+        <button type="button" class="btn btn-ghost" onclick="closeModal()">Cancelar</button>
+      </div>
+    </form>
+  `);
+}
+
+async function criarProcesso(ev){
+  ev.preventDefault(); const f = ev.target;
+  const clientes_ids = [...f.querySelectorAll('input[name="clientes"]:checked')].map(i=>i.value);
+  if(clientes_ids.length===0){ toast('Selecione ao menos um cliente.'); return; }
+  const body = {
+    numero_cnj: f.numero_cnj.value, classe: f.classe.value, assunto: f.assunto.value,
+    vara: f.vara.value, comarca: f.comarca.value, status: f.status.value,
+    valor_causa: f.valor_causa.value ? parseFloat(f.valor_causa.value) : null,
+    sigla_tribunal: f.sigla_tribunal.value || null,
+    atribuir_usuario_id: f.atribuir.value || null,
+    clientes_ids,
+  };
+  try{
+    const r = await api('POST', '/processos', body);
+    closeModal();
+    toast(r.tribunal_detectado ? `Processo cadastrado. Tribunal detectado: ${r.tribunal_detectado}.` : 'Processo cadastrado.');
+    stateProcessos = await api('GET','/processos'); render();
+  }catch(e){ toast(e.message); }
+}
+
+/* ============================================================
+   AGENDA
+   ============================================================ */
+
+function viewAgenda(){
+  const hoje = new Date().toISOString().slice(0,10);
+  return `
+    <div class="page-head"><div><h2>Agenda</h2><div class="sub">${stateAgenda.length} compromissos</div></div></div>
+    <div class="panel" style="padding:0;">
+      <table><thead><tr><th>Tipo</th><th>Descrição</th><th>Data</th><th>Processo</th><th>Responsável</th><th>Status</th><th></th></tr></thead><tbody>
+        ${stateAgenda.map(a=>{
+          const atrasado = (a.data_hora||'').slice(0,10) < hoje;
+          return `<tr><td>${escapeHtml(a.tipo)}</td><td class="t-primary">${escapeHtml(a.descricao)}</td><td class="mono">${(a.data_hora||'').replace('T',' ').slice(0,16)}</td>
+            <td class="mono">${escapeHtml(a.processo_numero)}</td><td>${escapeHtml(a.advogado_nome||'—')}</td>
+            <td>${atrasado?'<span class="tag tag-atrasado">ATRASADO</span>':'<span class="tag tag-status">pendente</span>'}</td>
+            <td><button class="btn btn-ghost btn-sm" onclick="concluirCompromisso('${a.id}')">Concluir</button></td></tr>`;
+        }).join('') || `<tr><td colspan="7" class="empty">Nada na agenda.</td></tr>`}
+      </tbody></table>
+    </div>`;
+}
+
+async function concluirCompromisso(id){
+  try{ await api('POST', `/compromissos/${id}/concluir`); stateAgenda = await api('GET','/agenda?incluir_concluidos=false'); render(); }
+  catch(e){ toast(e.message); }
+}
+
+/* ============================================================
+   AVISOS
+   ============================================================ */
+
+function viewAvisos(){
+  return `
+    <div class="page-head"><div><h2>Avisos</h2><div class="sub">Pendentes de envio ao cliente</div></div></div>
+    ${stateAvisos.map(a=>`<div class="notice-card">
+        <div style="flex:1;">${tagImportancia(a.importancia)} <strong style="margin-left:8px;color:#fff;font-weight:600;">${escapeHtml(a.cliente_nome)}</strong> — <span class="mono" style="color:var(--slate)">${escapeHtml(a.processo_numero)}</span>
+          <div class="msg">${escapeHtml(a.mensagem)}</div></div>
+        <button class="btn btn-sm" style="width:auto;height:fit-content;" onclick="marcarAvisado('${a.id}')">Marcar como avisado</button>
+      </div>`).join('') || `<div class="empty">Nenhum aviso pendente.</div>`}`;
+}
+
+async function marcarAvisado(id){
+  try{ await api('POST', `/avisos/${id}/marcar-enviado`); stateAvisos = await api('GET','/avisos'); renderNav(); render(); }
+  catch(e){ toast(e.message); }
+}
+
+/* ============================================================
+   BUSCAR
+   ============================================================ */
+
+function viewBuscar(){
+  return `<div class="page-head"><div><h2>Buscar</h2></div></div>
+    <input class="search-box" placeholder="Nome, CPF/CNPJ ou número de processo..." oninput="fazerBusca(this.value)">
+    <div id="busca-resultados"></div>`;
+}
+
+let buscaTimeout;
+function fazerBusca(termo){
+  clearTimeout(buscaTimeout);
+  if(!termo){ document.getElementById('busca-resultados').innerHTML=''; return; }
+  buscaTimeout = setTimeout(async ()=>{
+    try{
+      const r = await api('GET', `/buscar?termo=${encodeURIComponent(termo)}`);
+      document.getElementById('busca-resultados').innerHTML = `
+        <div class="panel"><h3>Clientes (${r.clientes.length})</h3>
+          <table><thead><tr><th>Nome</th><th>CPF/CNPJ</th></tr></thead><tbody>
+            ${r.clientes.map(c=>`<tr><td class="t-primary">${escapeHtml(c.nome)}</td><td class="mono">${escapeHtml(c.cpf_cnpj)}</td></tr>`).join('') || `<tr><td colspan="2" class="empty">Nada encontrado.</td></tr>`}
+          </tbody></table></div>
+        <div class="panel"><h3>Processos (${r.processos.length})</h3>
+          <table><thead><tr><th>Número</th><th>Classe</th></tr></thead><tbody>
+            ${r.processos.map(p=>`<tr><td class="mono t-primary">${escapeHtml(p.numero_cnj)}</td><td>${escapeHtml(p.classe)}</td></tr>`).join('') || `<tr><td colspan="2" class="empty">Nada encontrado.</td></tr>`}
+          </tbody></table></div>`;
+    }catch(e){ toast(e.message); }
+  }, 300);
+}
+
+/* ============================================================
+   EQUIPE
+   ============================================================ */
+
+function viewEquipe(){
+  return `
+    <div class="page-head"><div><h2>Equipe</h2></div>
+      <button class="btn btn-sm" style="width:auto" onclick="abrirModalMembro()">+ Adicionar membro</button></div>
+    <div class="panel" style="padding:0;">
+      <table><thead><tr><th>Nome</th><th>E-mail</th><th>Perfil</th><th>Ativo</th></tr></thead><tbody>
+        ${stateEquipe.map(u=>`<tr><td class="t-primary">${escapeHtml(u.nome)}</td><td class="mono">${escapeHtml(u.email)}</td><td><span class="tag tag-status">${escapeHtml(u.perfil)}</span></td><td>${u.ativo?'sim':'não'}</td></tr>`).join('')}
+      </tbody></table>
+    </div>`;
+}
+
+function abrirModalMembro(){
+  openModal(`
+    <h3>Adicionar membro</h3>
+    <form onsubmit="criarMembro(event)">
+      <div class="field"><label>Nome</label><input name="nome" required></div>
+      <div class="field"><label>E-mail</label><input name="email" type="email" required></div>
+      <div class="field"><label>Senha provisória</label><input name="senha" type="password" required></div>
+      <div class="field"><label>Perfil</label><select name="perfil"><option value="advogado">Advogado</option><option value="lider">Líder</option></select></div>
+      <div class="modal-actions"><button type="submit" class="btn">Adicionar</button><button type="button" class="btn btn-ghost" onclick="closeModal()">Cancelar</button></div>
+    </form>
+  `);
+}
+
+async function criarMembro(ev){
+  ev.preventDefault(); const f = ev.target;
+  try{
+    await api('POST','/equipe', {nome:f.nome.value, email:f.email.value, senha:f.senha.value, perfil:f.perfil.value});
+    closeModal(); toast('Membro adicionado.');
+    stateEquipe = await api('GET','/equipe'); equipeCache = stateEquipe; render();
+  }catch(e){ toast(e.message); }
+}
+
+/* ============================================================
+   RELATÓRIO
+   ============================================================ */
+
+const RELATORIO_TABS = [
+  ['movimentacoes','Movimentacoes'], ['parados','Parados'], ['produtividade','Produtividade'],
+  ['distribuicao','Distribuicao'], ['cliente','Historico por cliente'],
+  ['prazos','Prazos'], ['qualidade','Qualidade de dados'],
+];
+
+function fmtHoras(h){
+  if(h===null || h===undefined) return '\u2014';
+  if(h < 1) return Math.round(h*60) + ' min';
+  return h.toFixed(1) + 'h';
+}
+
+function criarOuAtualizarChart(canvasId, config){
+  if(chartInstances[canvasId]){ chartInstances[canvasId].destroy(); }
+  const el = document.getElementById(canvasId);
+  if(!el || typeof Chart === 'undefined') return;
+  chartInstances[canvasId] = new Chart(el, config);
+}
+
+async function exportarRelatorioCSV(path, nomeArquivo){
+  try{
+    const res = await api('GET', path);
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url; a.download = nomeArquivo; a.click();
+    URL.revokeObjectURL(url);
+  }catch(e){ toast('Erro ao exportar: ' + e.message); }
+}
+
+async function irParaSubAbaRelatorio(tab){
+  relatorioSubTab = tab;
+  render();
+  try{
+    if(tab==='produtividade' && stateRelProdutividade.length===0){
+      stateRelProdutividade = await api('GET','/relatorio/produtividade');
+    } else if(tab==='distribuicao' && !stateRelDistribuicao){
+      stateRelDistribuicao = await api('GET','/relatorio/distribuicao');
+    } else if(tab==='prazos' && !stateRelPrazos){
+      stateRelPrazos = await api('GET','/relatorio/prazos');
+    } else if(tab==='qualidade' && !stateRelQualidade){
+      stateRelQualidade = await api('GET','/relatorio/qualidade');
+    } else if(tab==='cliente' && stateClientes.length===0){
+      stateClientes = await api('GET','/clientes');
+    }
+    render();
+    desenharGraficosRelatorio();
+  }catch(e){ toast(e.message); }
+}
+
+async function atualizarRelatorioMovimentacoes(){
+  const ordenar = document.getElementById('rel-ordenar').value;
+  try{ stateRelatorioMov = await api('GET', `/relatorio/movimentacoes?ordenar_por=${ordenar}`); render(); }
+  catch(e){ toast(e.message); }
+}
+
+async function selecionarClienteRelatorio(clienteId){
+  stateRelClienteSelecionado = clienteId;
+  if(!clienteId){ stateRelClienteHistorico = null; render(); return; }
+  try{ stateRelClienteHistorico = await api('GET', `/relatorio/cliente/${clienteId}`); render(); }
+  catch(e){ toast(e.message); }
+}
+
+function desenharGraficosRelatorio(){
+  if(currentView !== 'relatorio') return;
+
+  if(relatorioSubTab==='distribuicao' && stateRelDistribuicao){
+    const d = stateRelDistribuicao;
+    const cores = ['#c9a24b','#e08a77','#7fae7a','#8a93a6','#dcb968','#e8d9ae'];
+    criarOuAtualizarChart('chart-rel-status', {
+      type: 'doughnut',
+      data: { labels: d.por_status.map(x=>x.chave), datasets: [{ data: d.por_status.map(x=>x.total), backgroundColor: cores }] },
+      options: { plugins: { legend: { labels: { color: '#f3efe6' } } } }
+    });
+    criarOuAtualizarChart('chart-rel-classe', {
+      type: 'bar',
+      data: { labels: d.por_classe.map(x=>x.chave), datasets: [{ label: 'Processos', data: d.por_classe.map(x=>x.total), backgroundColor: '#c9a24b' }] },
+      options: { plugins: { legend: { display: false } }, scales: { x: { ticks: { color: '#8a93a6' } }, y: { ticks: { color: '#8a93a6' } } } }
+    });
+  }
+
+  if(relatorioSubTab==='produtividade' && stateRelProdutividade.length){
+    criarOuAtualizarChart('chart-rel-produtividade', {
+      type: 'bar',
+      data: { labels: stateRelProdutividade.map(x=>x.nome), datasets: [{ label: 'Movimentacoes no periodo', data: stateRelProdutividade.map(x=>x.movimentacoes_periodo), backgroundColor: '#c9a24b' }] },
+      options: { plugins: { legend: { display: false } }, scales: { x: { ticks: { color: '#8a93a6' } }, y: { ticks: { color: '#8a93a6' } } } }
+    });
+  }
+
+  if(relatorioSubTab==='prazos' && stateRelPrazos){
+    const p = stateRelPrazos;
+    const pendentes = Math.max(0, p.total - p.concluidos - p.atrasados);
+    criarOuAtualizarChart('chart-rel-prazos', {
+      type: 'doughnut',
+      data: { labels: ['Concluidos','Atrasados','Pendentes no prazo'], datasets: [{ data: [p.concluidos, p.atrasados, pendentes], backgroundColor: ['#7fae7a','#c15b4a','#c9a24b'] }] },
+      options: { plugins: { legend: { labels: { color: '#f3efe6' } } } }
+    });
+  }
+}
+
+function viewRelatorio(){
+  const tabsHtml = RELATORIO_TABS.map(([id,label])=>
+    `<button class="inner-tab ${relatorioSubTab===id?'active':''}" onclick="irParaSubAbaRelatorio('${id}')">${label}</button>`
+  ).join('');
+
+  let corpo = '';
+  if(relatorioSubTab==='movimentacoes') corpo = relatorioMovimentacoesHTML();
+  else if(relatorioSubTab==='parados') corpo = relatorioParadosHTML();
+  else if(relatorioSubTab==='produtividade') corpo = relatorioProdutividadeHTML();
+  else if(relatorioSubTab==='distribuicao') corpo = relatorioDistribuicaoHTML();
+  else if(relatorioSubTab==='cliente') corpo = relatorioClienteHTML();
+  else if(relatorioSubTab==='prazos') corpo = relatorioPrazosHTML();
+  else if(relatorioSubTab==='qualidade') corpo = relatorioQualidadeHTML();
+
+  return `
+    <div class="page-head"><div><h2>Relatorio</h2><div class="sub">Analises do escritorio</div></div></div>
+    <div class="inner-tabs">${tabsHtml}</div>
+    ${corpo}
+  `;
+}
+
+function relatorioMovimentacoesHTML(){
+  return `
+    <div class="inline-form">
+      <div class="field"><label>Ordenar por</label><select id="rel-ordenar" onchange="atualizarRelatorioMovimentacoes()">
+        <option value="recente">Mais recentes</option><option value="antigo">Mais antigos</option><option value="urgente">Mais urgentes</option>
+      </select></div>
+      <button class="btn btn-ghost btn-sm" onclick="exportarRelatorioCSV('/relatorio/movimentacoes?formato=csv','movimentacoes.csv')">Exportar CSV</button>
+    </div>
+    <div class="panel" style="padding:0;">
+      <table><thead><tr><th>Data</th><th>Importancia</th><th>Processo</th><th>Advogado</th><th>Descricao</th></tr></thead><tbody id="rel-mov-body">
+        ${stateRelatorioMov.map(m=>`<tr><td class="mono">${(m.data||'').slice(0,10)}</td><td>${tagImportancia(m.importancia)}</td><td class="mono">${escapeHtml(m.processo_numero)}</td><td>${escapeHtml(m.advogado_nome||'\u2014')}</td><td class="t-primary">${escapeHtml(m.descricao)}</td></tr>`).join('') || `<tr><td colspan="5" class="empty">Nada encontrado.</td></tr>`}
+      </tbody></table>
+    </div>`;
+}
+
+function relatorioParadosHTML(){
+  return `
+    <div class="inline-form">
+      <button class="btn btn-ghost btn-sm" onclick="exportarRelatorioCSV('/relatorio/parados?formato=csv','processos_parados.csv')">Exportar CSV</button>
+    </div>
+    <div class="panel" style="padding:0;">
+      <table><thead><tr><th>Processo</th><th>Status</th><th>Advogado</th><th>Ultima atualizacao</th></tr></thead><tbody>
+        ${stateRelatorioParados.map(p=>`<tr><td class="mono t-primary">${escapeHtml(p.numero_cnj)}</td><td><span class="tag tag-status">${escapeHtml(p.status)}</span></td><td>${escapeHtml(p.advogado_nome||'\u2014')}</td><td class="mono">${(p.ultima_movimentacao||'nunca').slice(0,10)}</td></tr>`).join('') || `<tr><td colspan="4" class="empty">Nada encontrado.</td></tr>`}
+      </tbody></table>
+    </div>`;
+}
+
+function relatorioProdutividadeHTML(){
+  if(!stateRelProdutividade.length) return `<div class="empty">Carregando...</div>`;
+  return `
+    <div class="inline-form">
+      <button class="btn btn-ghost btn-sm" onclick="exportarRelatorioCSV('/relatorio/produtividade?formato=csv','produtividade.csv')">Exportar CSV</button>
+    </div>
+    <div class="panel">
+      <div style="position:relative;height:280px;"><canvas id="chart-rel-produtividade"></canvas></div>
+    </div>
+    <div class="panel" style="padding:0;">
+      <table><thead><tr><th>Advogado</th><th>Processos ativos</th><th>Movimentacoes no periodo</th><th>Tempo medio ate avisar</th></tr></thead><tbody>
+        ${stateRelProdutividade.map(a=>`<tr><td class="t-primary">${escapeHtml(a.nome)}</td><td class="mono">${a.processos_ativos}</td><td class="mono">${a.movimentacoes_periodo}</td><td class="mono">${fmtHoras(a.horas_medias_ate_avisar)}</td></tr>`).join('')}
+      </tbody></table>
+    </div>`;
+}
+
+function relatorioDistribuicaoHTML(){
+  if(!stateRelDistribuicao) return `<div class="empty">Carregando...</div>`;
+  const d = stateRelDistribuicao;
+  return `
+    <div class="grid-2">
+      <div class="panel">
+        <h3>Por status</h3>
+        <div style="position:relative;height:240px;"><canvas id="chart-rel-status"></canvas></div>
+        <div class="modal-actions"><button class="btn btn-ghost btn-sm" onclick="exportarRelatorioCSV('/relatorio/distribuicao?formato=csv&secao=status','distribuicao_status.csv')">Exportar CSV</button></div>
+      </div>
+      <div class="panel">
+        <h3>Por classe processual</h3>
+        <div style="position:relative;height:240px;"><canvas id="chart-rel-classe"></canvas></div>
+        <div class="modal-actions"><button class="btn btn-ghost btn-sm" onclick="exportarRelatorioCSV('/relatorio/distribuicao?formato=csv&secao=classe','distribuicao_classe.csv')">Exportar CSV</button></div>
+      </div>
+    </div>
+    <div class="grid-2">
+      <div class="panel">
+        <h3>Por comarca</h3>
+        <table><thead><tr><th>Comarca</th><th>Total</th></tr></thead><tbody>
+          ${d.por_comarca.map(x=>`<tr><td class="t-primary">${escapeHtml(x.chave)}</td><td class="mono">${x.total}</td></tr>`).join('') || `<tr><td colspan="2" class="empty">Sem dados.</td></tr>`}
+        </tbody></table>
+        <div class="modal-actions"><button class="btn btn-ghost btn-sm" onclick="exportarRelatorioCSV('/relatorio/distribuicao?formato=csv&secao=comarca','distribuicao_comarca.csv')">Exportar CSV</button></div>
+      </div>
+      <div class="panel">
+        <h3>Sincronizados vs manuais (DataJud)</h3>
+        <table><thead><tr><th>Tipo</th><th>Total</th></tr></thead><tbody>
+          ${d.sincronizacao.map(x=>`<tr><td class="t-primary">${escapeHtml(x.chave)}</td><td class="mono">${x.total}</td></tr>`).join('')}
+        </tbody></table>
+        <div class="modal-actions"><button class="btn btn-ghost btn-sm" onclick="exportarRelatorioCSV('/relatorio/distribuicao?formato=csv&secao=sincronizacao','distribuicao_sincronizacao.csv')">Exportar CSV</button></div>
+      </div>
+    </div>`;
+}
+
+function relatorioClienteHTML(){
+  const opcoes = stateClientes.map(c=>`<option value="${c.id}" ${stateRelClienteSelecionado===c.id?'selected':''}>${escapeHtml(c.nome)}</option>`).join('');
+  let corpoHistorico = `<div class="empty">Selecione um cliente para ver o historico.</div>`;
+  if(stateRelClienteHistorico){
+    const h = stateRelClienteHistorico;
+    corpoHistorico = `
+      <div class="modal-actions" style="margin-bottom:16px;">
+        <button class="btn btn-ghost btn-sm" onclick="exportarRelatorioCSV('/relatorio/cliente/${stateRelClienteSelecionado}?formato=csv','historico_cliente.csv')">Exportar CSV</button>
+      </div>
+      <h3>Processos vinculados</h3>
+      <table><thead><tr><th>Numero</th><th>Classe</th><th>Status</th></tr></thead><tbody>
+        ${h.processos.map(p=>`<tr><td class="mono t-primary">${escapeHtml(p.numero_cnj)}</td><td>${escapeHtml(p.classe)}</td><td><span class="tag tag-status">${escapeHtml(p.status)}</span></td></tr>`).join('') || `<tr><td colspan="3" class="empty">Nenhum processo.</td></tr>`}
+      </tbody></table>
+      <h3 style="margin-top:20px;">Linha do tempo</h3>
+      <table><thead><tr><th>Data</th><th>Processo</th><th>Importancia</th><th>Descricao</th></tr></thead><tbody>
+        ${h.movimentacoes.map(m=>`<tr><td class="mono">${(m.data||'').slice(0,10)}</td><td class="mono">${escapeHtml(m.processo_numero)}</td><td>${tagImportancia(m.importancia)}</td><td class="t-primary">${escapeHtml(m.descricao)}</td></tr>`).join('') || `<tr><td colspan="4" class="empty">Nenhuma movimentacao.</td></tr>`}
+      </tbody></table>`;
+  }
+  return `
+    <div class="field" style="max-width:360px;margin-bottom:20px;">
+      <label>Cliente</label>
+      <select onchange="selecionarClienteRelatorio(this.value)">
+        <option value="">Selecione...</option>
+        ${opcoes}
+      </select>
+    </div>
+    <div class="panel">${corpoHistorico}</div>`;
+}
+
+function relatorioPrazosHTML(){
+  if(!stateRelPrazos) return `<div class="empty">Carregando...</div>`;
+  const p = stateRelPrazos;
+  return `
+    <div class="metrics">
+      <div class="metric"><div class="v">${p.total}</div><div class="l">Total de compromissos</div></div>
+      <div class="metric"><div class="v">${p.concluidos}</div><div class="l">Concluidos</div></div>
+      <div class="metric"><div class="v">${p.atrasados}</div><div class="l">Atrasados</div></div>
+    </div>
+    <div class="panel">
+      <div style="position:relative;height:240px;"><canvas id="chart-rel-prazos"></canvas></div>
+    </div>
+    <div class="panel" style="padding:0;">
+      <table><thead><tr><th>Tipo</th><th>Total</th><th>Concluidos</th></tr></thead><tbody>
+        ${p.por_tipo.map(t=>`<tr><td class="t-primary">${escapeHtml(t.tipo)}</td><td class="mono">${t.total}</td><td class="mono">${t.concluidos}</td></tr>`).join('') || `<tr><td colspan="3" class="empty">Sem dados.</td></tr>`}
+      </tbody></table>
+    </div>
+    ${p.por_advogado.length ? `
+    <div class="panel" style="padding:0;">
+      <table><thead><tr><th>Advogado</th><th>Total</th><th>Atrasados</th></tr></thead><tbody>
+        ${p.por_advogado.map(a=>`<tr><td class="t-primary">${escapeHtml(a.advogado_nome)}</td><td class="mono">${a.total}</td><td class="mono">${a.atrasados}</td></tr>`).join('')}
+      </tbody></table>
+    </div>` : ''}
+    <div class="modal-actions">
+      <button class="btn btn-ghost btn-sm" onclick="exportarRelatorioCSV('/relatorio/prazos?formato=csv','prazos.csv')">Exportar CSV</button>
+    </div>`;
+}
+
+function relatorioQualidadeHTML(){
+  if(!stateRelQualidade) return `<div class="empty">Carregando...</div>`;
+  const q = stateRelQualidade;
+  return `
+    <div class="metrics">
+      <div class="metric"><div class="v">${q.sem_tribunal.length}</div><div class="l">Sem tribunal (fora do DataJud)</div></div>
+      <div class="metric"><div class="v">${q.sem_advogado.length}</div><div class="l">Sem advogado atribuido</div></div>
+      <div class="metric"><div class="v">${q.sem_movimentacao.length}</div><div class="l">Sem nenhuma movimentacao</div></div>
+    </div>
+    <div class="grid-2">
+      <div class="panel"><h3>Sem tribunal</h3>
+        ${q.sem_tribunal.map(n=>`<div class="mono" style="padding:4px 0;">${escapeHtml(n)}</div>`).join('') || `<div class="empty">Nenhum.</div>`}
+      </div>
+      <div class="panel"><h3>Sem advogado</h3>
+        ${q.sem_advogado.map(n=>`<div class="mono" style="padding:4px 0;">${escapeHtml(n)}</div>`).join('') || `<div class="empty">Nenhum.</div>`}
+      </div>
+    </div>
+    <div class="panel"><h3>Sem nenhuma movimentacao</h3>
+      ${q.sem_movimentacao.map(n=>`<div class="mono" style="padding:4px 0;">${escapeHtml(n)}</div>`).join('') || `<div class="empty">Nenhum.</div>`}
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost btn-sm" onclick="exportarRelatorioCSV('/relatorio/qualidade?formato=csv','qualidade_dados.csv')">Exportar CSV</button>
+    </div>`;
+}
+</script>
+</body>
+</html>
